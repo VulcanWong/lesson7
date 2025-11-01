@@ -1,0 +1,117 @@
+<!DOCTYPE html>
+<h1>i learnt this because my previous teacher told me this and I write it down</h1>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width,initial-scale=1" />
+  <title>Registration</title>
+  <style>
+    body { font-family: Arial, sans-serif; background:#f5f7fb; margin:0; padding:40px; }
+    .container { max-width:420px; margin:0 auto; background:#fff; padding:24px; border-radius:8px; box-shadow:0 6px 18px rgba(0,0,0,0.06); }
+    h1 { font-size:20px; margin:0 0 16px; }
+    label { display:block; margin-top:12px; font-size:13px; }
+    input[type="text"], input[type="email"], input[type="password"], input[type="tel"] {
+      width:100%; padding:10px; margin-top:6px; box-sizing:border-box; border:1px solid #cbd5e1; border-radius:6px;
+    }
+    .row { display:flex; gap:8px; }
+    .row .col { flex:1; }
+    .error { color:#b91c1c; font-size:12px; margin-top:6px; display:none; }
+    .success { color:#065f46; font-size:13px; margin-top:12px; display:none; }
+    button { margin-top:18px; width:100%; padding:10px; background:#2563eb; color:#fff; border:none; border-radius:6px; cursor:pointer; }
+    button:disabled { background:#93c5fd; cursor:not-allowed; }
+    .small { font-size:12px; color:#475569; margin-top:8px; }
+  </style>
+</head>
+<body>
+  <div class="container">
+    <h1>Create an account</h1>
+    <form id="regForm" novalidate>
+      <div class="row">
+        <div class="col">
+          <label for="firstName">First name</label>
+          <input id="firstName" name="firstName" type="text" required />
+          <div id="err-firstName" class="error">First name is required.</div>
+        </div>
+        <div class="col">
+          <label for="lastName">Last name</label>
+          <input id="lastName" name="lastName" type="text" required />
+          <div id="err-lastName" class="error">Last name is required.</div>
+        </div>
+      </div>
+      <label for="email">Email</label>
+      <input id="email" name="email" type="email" required />
+      <div id="err-email" class="error">Please enter a valid email address.</div>
+      <label for="username">Username</label>
+      <input id="username" name="username" type="text" required minlength="3" />
+      <div id="err-username" class="error">Username must be at least 3 characters.</div>
+      <label for="password">Password</label>
+      <input id="password" name="password" type="password" required minlength="8" />
+      <div id="err-password" class="error">Password must be 8+ characters.</div>
+      <label for="confirm">Confirm password</label>
+      <input id="confirm" name="confirm" type="password" required />
+      <div id="err-confirm" class="error">Passwords do not match.</div>
+      <label for="phone">Phone (optional)</label>
+      <input id="phone" name="phone" type="tel" placeholder="(555) 123-4567" />
+      <div class="small">By registering you agree to the terms.</div>
+      <label style="margin-top:12px;">
+        <input id="terms" type="checkbox" /> I accept the terms
+      </label>
+      <div id="err-terms" class="error">You must accept the terms.</div>
+      <button id="submitBtn" type="submit" disabled>Create account</button>
+      <div id="success" class="success">Registration successful (demo).</div>
+    </form>
+  </div>
+  <script>
+    const form = document.getElementById('regForm');
+    const submitBtn = document.getElementById('submitBtn');
+    const fields = {
+      firstName: document.getElementById('firstName'),
+      lastName: document.getElementById('lastName'),
+      email: document.getElementById('email'),
+      username: document.getElementById('username'),
+      password: document.getElementById('password'),
+      confirm: document.getElementById('confirm'),
+      terms: document.getElementById('terms')
+    };
+    function showError(id, show) {
+      const el = document.getElementById('err-' + id);
+      if (!el) return;
+      el.style.display = show ? 'block' : 'none';
+    }
+    function validate() {
+      let ok = true;
+      if (!fields.firstName.value.trim()) { showError('firstName', true); ok = false; } else showError('firstName', false);
+      if (!fields.lastName.value.trim()) { showError('lastName', true); ok = false; } else showError('lastName', false);
+      const emailValid = /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(fields.email.value);
+      if (!emailValid) { showError('email', true); ok = false; } else showError('email', false);
+      if (fields.username.value.trim().length < 3) { showError('username', true); ok = false; } else showError('username', false);
+      if (fields.password.value.length < 8) { showError('password', true); ok = false; } else showError('password', false);
+      if (fields.password.value !== fields.confirm.value) { showError('confirm', true); ok = false; } else showError('confirm', false);
+      if (!fields.terms.checked) { showError('terms', true); ok = false; } else showError('terms', false);
+      submitBtn.disabled = !ok;
+      return ok;
+    }
+    Object.values(fields).forEach(f => {
+      if (f) f.addEventListener('input', validate);
+      if (f && f.type === 'checkbox') f.addEventListener('change', validate);
+    });
+    form.addEventListener('submit', function (e) {
+      e.preventDefault();
+      if (!validate()) return;
+      const user = {
+        firstName: fields.firstName.value.trim(),
+        lastName: fields.lastName.value.trim(),
+        email: fields.email.value.trim(),
+        username: fields.username.value.trim(),
+        phone: document.getElementById('phone').value.trim()
+      };
+      const users = JSON.parse(localStorage.getItem('demoUsers') || '[]');
+      users.push(user);
+      localStorage.setItem('demoUsers', JSON.stringify(users));
+      document.getElementById('success').style.display = 'block';
+      submitBtn.disabled = true;
+    });
+    validate();
+  </script>
+</body>
+</html>
